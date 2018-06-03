@@ -1,0 +1,48 @@
+{include file="public/header"/}
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+
+    <!-- 上方tab -->
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+            <div class="ibox float-e-margins" style="text-align: center">
+                <div class="ibox-title">
+                    <h2 >当前币价</h2>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins" style="font-size: 100px">{$moneyData.price}</h1>
+                    <small style="font-size: 20px;text-align: left;">最后更新时间：{$moneyData.update_time}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-sm-offset-3">
+            <div class="ibox float-e-margins" style="text-align: center">
+                <div class="ibox-title">
+                    <h2 >币值调整</h2>
+                </div>
+
+                <div class="ibox-content">
+                    <!--工具条-->
+                    <form action="{:url('add')}" class="" method="post">
+                        增加币值：<input type="text"  name="add" value=""><br><br>
+                        增加幅度：<input type="text"  name="add_range" value=""><br><br>
+                        <input type="submit" class="btn-primary" value="增加币值">
+                    </form>
+                </div>
+                <div class="ibox-content">
+                    <!--工具条-->
+                    <form action="{:url('reduce')}" class="" method="post">
+                        减少币值：<input type="number" min="0" name="reduce" value=""><br><br>
+                        减少幅度：<input type="number" min="0" name="reduce_range" value=""><br><br>
+                        <input type="submit" class="btn-danger" value="减少币值">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file="public/footer" /}
+</body>
+</html>

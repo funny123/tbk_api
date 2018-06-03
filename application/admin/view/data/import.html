@@ -1,0 +1,100 @@
+{include file="public/header" /}
+<link href="__CSS__/plugins/iCheck/custom.css" rel="stylesheet">
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>数据库还原</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="table_basic.html#">
+                        <i class="fa fa-wrench"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <form id="export-form" method="post" action="{:url('export')}">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr class="long-tr">
+                                <th >备份名称</th>
+                                <th >卷数</th>
+                                <th >压缩</th>
+                                <th >数据大小</th>
+                                <th >备份时间</th>
+                                <th >状态</th>
+                                <th >操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {notempty name="data"}
+                                {volist name="data" id="vo"}
+                                    <tr class="long-td">
+                                        <td>{$vo.time|date='Ymd-His',###}</td>
+                                        <td>{$vo.part}</td>
+                                        <td>{$vo.compress}</td>
+                                        <td>{$vo.size|format_bytes}</td>
+                                        <td>{$key}</td>
+                                        <td>-</td>
+                                        <td>
+                                            <a class="btn btn-primary btn-xs btn-outline db-import" href="{:url('revert',['time'=>$vo['time']])}">还原</a>
+                                            <a class="btn btn-danger btn-xs btn-outline" href="{:url('del',['time'=>$vo['time']])}">删除</a>
+                                        </td>
+                                    </tr>
+                                {/volist}
+                            {else /}
+                                <td colspan="7" class="text-center"> 暂无备份数据</td>
+                            {/notempty}
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+    $(function () {
+    
+        $(".db-import").click(function () {
+            var self = this, status = ".";
+            $.get(self.href, success, "json");
+            window.onbeforeunload = function () { return "正在还原数据库，请不要关闭！";};
+            return false;
+            function success(data) {
+                if (data.code) {
+                    if (data.data.gz) {
+                        data.msg += status;
+                        if (status.length === 5) {
+                            status = ".";
+                        } else {
+                            status += ".";
+                        }
+                    }
+                    $(self).parent().prev().text(data.msg);
+                    if (data.data.part) {
+                        $.get(self.href, {"part": data.data.part, "start": data.data.start}, success, "json");
+                    } else {
+                        window.onbeforeunload = function () {return null;};
+                    }
+                } else {
+                    layer.alert(data.msg,0);
+                }
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

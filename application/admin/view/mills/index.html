@@ -1,0 +1,203 @@
+{include file="public/header" /}
+<style type="text/css">
+    /*elementUI分页样式*/
+.layout-pagination {
+    text-align: right;
+    margin-top: 15px;
+}
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins" id="app" v-cloak>
+        <div class="ibox-title">
+            <h5>矿机列表</h5>
+        </div>
+        <div class="ibox-content">         
+            <!--工具条-->
+            <el-form :inline="true" class="demo-form-inline">
+                <el-form-item>
+                    <div class="col-sm-3" style="padding-left: 0px;">
+                        <div class="input-group">
+                            <input type="text" class="form-control" v-model="key" placeholder="输入需查询的矿机名称" />
+                            <span class="input-group-btn">
+                                <a type="button" class="btn btn-primary" @click="search"><i class="fa fa-search"></i> 搜索</a>
+                            </span>
+                        </div>
+                    </div>
+                    <a href="{:url('add_mills')}" type="button" class="btn btn-primary" >
+                        <i class="fa fa-plus"></i> 添加
+                    </a>
+                    <a shiro:hasPermission="admin:mills:del" type="button" class="btn btn-danger" @click="del">
+                        <i class="fa fa-trash-o"></i> 删除
+                    </a>
+                </el-form-item>
+            </el-form>
+
+            <div class="example-wrap">
+                <div class="example" >
+                    <el-table :data="tableData" border highlight-current-row v-loading="listLoading" element-loading-text="拼命加载中..." @selection-change="handleSelectionChange" style="width: 100%">
+                        <el-table-column type="selection" width="60" align="center"></el-table-column>
+                        <el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>
+                        <el-table-column prop="title" label="矿机名称" show-overflow-tooltip align="center"></el-table-column>
+                        <el-table-column prop="cate_name" label="矿机类型" show-overflow-tooltip align="center"></el-table-column>
+                        <el-table-column prop="avatar" label="矿机图片" align="center">
+                            <template scope="scope">
+                                <img :src="scope.row.photo ? imgPath + scope.row.photo:'/static/admin/images/no_img.jpg'" style="height: 50px;padding: 5px">
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="create_coin" label="日产币量" width="100" show-overflow-tooltip align="center"></el-table-column>
+                        <el-table-column prop="date" label="有效天数" width="100" show-overflow-tooltip align="center"></el-table-column>
+                        <el-table-column prop="price" label="售价" width="100" show-overflow-tooltip align="center"></el-table-column>
+                        <el-table-column prop="create_time" label="创建时间" show-overflow-tooltip align="center"></el-table-column>
+                        <el-table-column prop="status" label="状态" width="120" align="center">
+                            <template scope="scope">
+                                <span v-if="scope.row.status==0" style="color:#FF4949">禁用</span>
+                                <span v-if="scope.row.status==1" style="color:#07a379">启用</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="is_yin" label="是否隐藏" width="120" align="center">
+                            <template scope="scope">
+                                <span v-if="scope.row.is_yin==0" style="color:#FF4949">显示</span>
+                                <span v-if="scope.row.is_yin==1" style="color:#07a379">隐藏</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column align="center" width="120" label="操作">
+                            <template scope="scope">
+                                <el-button shiro:hasPermission="admin:mills:edit" size="small" type="text" @click="edit(scope.row)">编辑</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <div class="layout-pagination">
+                        <el-pagination
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="currentPage"
+                            :page-sizes="[10, 20, 50, 100]"
+                            :page-size="pageSize"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="totalCount">
+                        </el-pagination>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            imgPath: '/uploads/images/',
+            //表格当前页数据
+            tableData: [],
+            //多选数组
+            multipleSelection: [],
+            //搜索条件
+            key: '',
+            //默认每页数据量
+            pageSize: 10,
+            //当前页码
+            currentPage: 1,
+            //默认数据总数
+            totalCount: 0,
+            //列表加载遮罩
+            listLoading: false
+        },
+        methods: {
+            //从服务器读取数据
+            loadData(key, currentPage, pageSize){
+                vm.listLoading = true;
+                $.getJSON('{:url("mills/index")}', {key:key,page:currentPage,rows:pageSize}, function(data){
+                    vm.tableData = [];
+                    vm.totalCount = data.count;
+                    for(var i=0;i<data.list.length;i++){
+                        if(data.list[i]){
+                            vm.tableData.push(data.list[i]);
+                        }
+                    }
+                    vm.listLoading = false;
+                });
+            },
+            openMessage(type,message){
+                this.$message({
+                    type: type,
+                    duration: 1500,
+                    message: message
+                });
+            },
+            //每页显示数据量变更
+            handleSizeChange(val) {
+                this.pageSize = val;
+                this.loadData(this.key, this.currentPage, this.pageSize);
+            },
+            //页码变更
+            handleCurrentChange(val) {
+                this.currentPage = val;
+                this.loadData(this.key, this.currentPage, this.pageSize);
+            },
+            //多选响应
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            //搜索
+            search(){
+                this.loadData(this.key, this.currentPage, this.pageSize);
+                vm.listLoading = false;
+            },
+            //编辑
+            edit(row) {
+                location.href = './edit_mills/id/'+row.id+'.html';
+            },
+            //批量删除
+            del() {
+                if(this.multipleSelection.length==0){
+                    vm.openMessage('warning','请选择至少一条数据进行删除！');
+                    return;
+                }
+                var array = [];
+                this.multipleSelection.forEach((row) => {
+                    array.push(row.id);
+                })
+
+                this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    $.ajax({
+                        url: '{:url("mills/del_mills")}',
+                        data:"id="+array,
+                        type: "POST",
+                        dataType:'json',
+                        success:function(res){
+                            if(res.code == 1){
+                                vm.openMessage('success',res.msg);
+                                vm.loadData(vm.key, vm.currentPage, vm.pageSize);
+                            }else{
+                                vm.openMessage('error',res.msg);
+                            }
+                        },
+                        error:function(er){
+
+                        }
+                    });
+                }).catch(() => {
+                    vm.openMessage('info','已取消删除');
+                });
+            }
+        }
+    })
+
+    //载入数据
+    vm.loadData(vm.key, vm.currentPage, vm.pageSize);
+
+</script>
+
+</body>
+</html>

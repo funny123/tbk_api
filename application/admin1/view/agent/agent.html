@@ -1,0 +1,80 @@
+{include file="public/header" /}
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/style.css">
+<style>
+.file-item{float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
+.file-item .info{overflow: hidden;}
+.uploader-list{width: 100%; overflow: hidden;}
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>代理设置</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="form_basic.html#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                {if condition="isset($agent)"}
+                <div class="ibox-content">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">代理层级：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="number" readonly name="level" class="form-control" placeholder="请输入数字" value="{$agent.level}">
+                            </div>
+
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">代理名称：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" readonly name="name" class="form-control"  value="{if condition='isset($agent.name)'}{$agent.name}{else /}暂未设置{/if}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">注册赠币(个数)：</label>
+                            <div class="input-group col-sm-4">
+                                <input  readonly type="text" name="register_coin" class="form-control" value="{if condition='isset($agent.register_coin)'}{$agent.register_coin}{else /}暂未设置{/if}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">交易赠币(%)：</label>
+                            <div class="input-group col-sm-4">
+                                <input  readonly type="text" name="order_coin" class="form-control" value="{if condition='isset($agent.order_coin)'}{$agent.order_coin}{else /}暂未设置{/if}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">购买矿机赠币(%)：</label>
+                            <div class="input-group col-sm-4">
+                                <input  readonly type="text" name="mills_coin" class="form-control" value="{if condition='isset($agent.mills_coin)'}{$agent.mills_coin}{else /}暂未设置{/if}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-3">
+                                <a class="btn btn-primary" href="{:url('edit_agent')}"> 修改代理模式</a>
+                            </div>
+                        </div>
+                </div>
+                    {else /}
+                    <a style="font-size: 30px;color: red;" href="{:url('set_agent')}">您还暂未设置代理系统，请点击我进行设置</a>
+                    {/if}
+            </div>
+        </div>
+    </div>
+</div>
+  {include file="public/footer" /}
+</body>
+</html>

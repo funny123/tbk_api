@@ -1,0 +1,92 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>待审核会员列表</h5>
+        </div>
+        <div class="ibox-content">
+
+            <div class="example-wrap">
+                <div class="example">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="long-tr">
+                                <th>ID</th>
+                                <th>会员账号</th>
+                                <th>会员手机号码</th>
+                                <th>审核状态</th>
+                                <th>提交时间</th>
+                                <th>审核时间</th>
+                                <th width="20%">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="article_list">
+                        {if condition="isset($members)"}
+                            {foreach name="members" item="vo"}
+                                <tr class="long-td">
+                                    <td>{$vo.member_id}</td>
+                                    <td>{$vo.member_account}</td>
+                                    <td>{$vo.member_mobile}</td>
+                                    <td>
+                                        {if condition="$vo['status'] == 1"}
+                                            已提交
+                                        {elseif condition="$vo['status'] ==2" /}
+                                            审核成功
+                                        {elseif condition="$vo['status'] ==0" /}
+                                            失败
+                                        {/if}   
+                                    </td>
+                                    <td>{$vo.create_time|date="Y-m-d H:i:s",###}</td>
+                                    <td>{$vo.update_time|date="Y-m-d H:i:s",###}</td>
+                                    <td>
+                                        <a href="{:url('check',['id'=>$vo.member_id])}" class="btn btn-primary btn-outline btn-xs">
+                                            <i class="fa fa-search"></i> 认证</a>
+                                        <a href="javascript:;" onclick="del_order({$vo.id})" class="btn btn-danger btn-outline btn-xs">
+                                            <i class="fa fa-trash-o"></i> 删除</a>   
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {else /}
+                        <tr class="long-td">暂无订单数据</tr>
+                        {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+{include file="public/footer" /}
+
+
+<script type="text/javascript">
+
+    /**
+     * [del 删除订单]
+     */
+    function del_order(id){
+        layer.confirm('订单删除！不可恢复！谨慎操作！', {icon: 3, title:'提示'}, function(index){
+            //do something
+            $.getJSON('./del_order', {'id' : id}, function(res){
+                if(res.code == 1){
+                    layer.msg(res.msg,{icon:1,time:1500,shade: 0.1},function(){
+                        window.location.href="{:url('/buy')}";
+                    });
+                }else{
+                    layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+                }
+            });
+
+            layer.close(index);
+        })
+
+    }
+
+
+</script>
+</body>
+</html>

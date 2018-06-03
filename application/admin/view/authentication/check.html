@@ -1,0 +1,117 @@
+{include file="public/header" /}
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/admin/webupload/style.css">
+<style>
+.file-item{float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
+.file-item .info{overflow: hidden;}
+.uploader-list{width: 100%; overflow: hidden;}
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>会员认证</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="form_basic.html#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" name="edit" id="edit" method="post" action="{:url('check_error')}">
+                        <input type="hidden" name="id" value="{$member.member_id}">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">用户ID：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" readonly class="form-control"  value="{$member.member_id}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">账号：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" readonly class="form-control"  value="{$member.member_account}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">注册号码：</label>
+                            <div class="input-group col-sm-4">
+                                <input  type="text" readonly class="form-control" value="{$member.member_mobile}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">姓名：</label>
+                            <div class="input-group col-sm-4">
+                                <input  type="text" readonly class="form-control" value="{$member.name}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">身份证号：</label>
+                            <div class="input-group col-sm-4">
+                                <input  type="text" readonly class="form-control" value="{$member.person_id}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">银行卡号：</label>
+                            <div class="input-group col-sm-4">
+                                <input  type="text" readonly class="form-control" value="{$member.bank_id}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">银行预留手机号码：</label>
+                            <div class="input-group col-sm-4">
+                                <input  type="text" readonly class="form-control" value="{$member.bank_mobile}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">实名照片：</label>
+                            <div class="input-group col-sm-4">
+                                <img id="img_data" height="100px" style="float:left;margin-left: 50px;margin-top: -10px;"  src="/uploads/person_img/{$member.person_img}"/>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">提交时间：</label>
+                            <div class="input-group col-sm-4">
+                                <input  type="text" readonly class="form-control" value="{$member.update_time|date='Y-m-d H:i:s',###}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">认证失败原因：</label>
+                            <div class="input-group col-sm-4">
+                                <textarea name="error" cols="65" placeholder="若认证失败，请在此填写失败原因（若认证失败必填，认证成功请忽略）" rows="10"></textarea>
+                                <span style="color: red;font-size: 15px">{if condition="isset($message)"}{$message}{/if}</span>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-3">
+                                <a class="btn btn-primary" href="{:url('check_user',['id'=>$member.member_id,'bankcardno'=>$member.bank_id,'phone'=>$member.bank_mobile,'name'=>123,'idcardno'=>$member.person_id])}"><i class="fa fa-check"></i> 银行信息认证</a>&nbsp;
+                                <a class="btn btn-primary" href="{:url('check_success',['id'=>$member.member_id])}"><i class="fa fa-check"></i> 认证通过</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                                <button class="btn btn-danger" type="submit"><i class="fa fa-close"></i> 认证失败</button>&nbsp;&nbsp;
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  {include file="public/footer" /}
+</body>
+</html>

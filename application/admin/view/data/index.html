@@ -1,0 +1,155 @@
+{include file="public/header" /}
+<link href="__CSS__/plugins/iCheck/custom.css" rel="stylesheet">
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>数据库备份</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="table_basic.html#">
+                        <i class="fa fa-wrench"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-sm-9 m-b-xs">
+                        <button class="btn btn-outline btn-primary" href="javascript:;" id="export">立即备份</button>
+                        <button id="optimize" class="btn btn-outline btn-info " url="{:url('optimize')}" >优化表</button>
+                        <button id="repair" class="btn btn-outline btn-danger" url="{:url('repair')}" >修复表</button>
+                    </div>
+                </div>
+                <form id="export-form" method="post" action="{:url('export')}">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th><input class="i-checks checkbox check-all" checked="chedked" type="checkbox"></th>
+                                <th>表名</th>
+                                <th>数据量</th>
+                                <th>数据大小</th>
+                                <th>创建时间</th>
+                                <th>备份状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {notempty name="data"}
+                                {volist name="data" id="vo"}
+                                <tr>
+                                    <td><input class="ids i-checks" checked="chedked" type="checkbox" name="ids[]" value="{$vo.name}"></td>
+                                    <td>{$vo.name}</td>
+                                    <td>【{$vo.rows}】 条记录</td>
+                                    <td>{$vo.data_length|format_bytes}</td>
+                                    <td>{$vo.create_time}</td>
+                                    <td id="info">等待备份...</td>
+                                    <td>
+                                        <a class="btn btn-primary btn-xs btn-outline" href="{:url('optimize',['ids'=>$vo['name']])}">优化表</a>
+                                        <a class="btn btn-danger btn-xs btn-outline" href="{:url('repair',['ids'=>$vo['name']])}">修复表</a>
+                                    </td>
+                                </tr>
+                                {/volist}
+                            {else /}
+                                <td colspan="7" class="text-center"> 暂未发现数据库表! </td>
+                            {/notempty}
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+
+//全选的实现
+$('.check-all').on('ifChecked', function (event) {
+    $('input[name="ids[]"]').iCheck('check');
+});
+$('.check-all').on('ifUnchecked', function (event) {
+    $('input[name="ids[]"]').iCheck('uncheck');
+});
+    $(function () {
+     
+        (function ($) {
+            var $form = $("#export-form"), $export = $("#export"), tables, $optimize = $("#optimize"), $repair = $("#repair");
+            $optimize.add($repair).click(function () {
+                $.post($(this).attr('url'), $form.serialize(), function (data) {
+                    if (data.code) {
+                        layer.msg(data.msg,{icon:1,time:2000,shade: 0.1,});
+                    } else {
+                        layer.msg(data.msg,{icon:2,time:2000,shade: 0.1,});
+                    }
+                });
+                return false;
+            });
+
+            $export.click(function () {
+                $export.parent().children().prop('disabled', true);
+                $export.html("正在发送备份请求...");
+                $.post(
+                        $form.attr("action"),
+                        $form.serialize(),
+                        function (data) {
+                            if (data.code) {
+                                tables = data.data.tables;
+                                $export.html(data.msg + "开始备份，请不要关闭本页面！");
+                                backup(data.data.tab);
+                                window.onbeforeunload = function () {
+                                    return "正在备份数据库，请不要关闭！";
+                                };
+                            } else {
+                                layer.msg(data.msg,{icon:2,time:2000,shade: 0.1,});
+                                $export.html("立即备份");
+                                setTimeout(function () {
+                                    $export.parent().children().prop('disabled', false);
+                                }, 1500);
+                            }
+                        });
+                return false;
+            });
+
+            function backup(tab, status) {
+                status && showmsg(tab.id, "开始备份...(0%)");
+                $.get($form.attr("action"), tab, function (data) {
+                    if (data.code) {
+                        showmsg(tab.id, data.msg);
+                        if (!$.isPlainObject(data.data.tab)) {
+                            $export.parent().children().prop('disabled', false);
+                            $export.html("备份完成，点击重新备份");
+                            window.onbeforeunload = function () {
+                                return null;
+                            };
+                            return;
+                        }
+                        backup(data.data.tab, tab.id != data.data.tab.id);
+                    } else {
+                        layer.msg(data.msg, 0);
+                        $export.html("立即备份");
+                        setTimeout(function () {
+                            $export.parent().children().prop('disabled', false);
+                        }, 1500);
+                    }
+                });
+            }
+
+            function showmsg(id, msg) {
+                $form.find("input[value=" + tables[id] + "]").closest("tr").find("#info").html(msg);
+            }
+        })(jQuery);
+    });
+
+</script>
+</body>
+</html>
